@@ -23,11 +23,10 @@ VERSION_XML2=2.9.4
 VERSION_GSF=1.14.41
 VERSION_EXIF=0.6.21
 VERSION_LCMS2=2.8
-VERSION_JPEG=1.5.1
-VERSION_PNG16=1.6.29
+VERSION_PNG16=1.6.31
 VERSION_WEBP=0.6.0
-VERSION_TIFF=4.0.7
-VERSION_ORC=0.4.26
+VERSION_TIFF=4.0.8
+VERSION_ORC=0.4.27
 VERSION_GDKPIXBUF=2.36.6
 VERSION_FREETYPE=2.8
 VERSION_EXPAT=2.2.0
@@ -39,6 +38,7 @@ VERSION_PANGO=1.40.5
 VERSION_CROCO=0.6.12
 VERSION_SVG=2.40.17
 VERSION_GIF=5.1.4
+VERSION_MOZJPEG=3.2
 
 # Least out-of-sync Sourceforge mirror
 SOURCEFORGE_MIRROR=netix
@@ -95,11 +95,11 @@ curl -Ls https://github.com/mm2/Little-CMS/compare/lcms2.8...master.patch | patc
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking
 make install-strip
 
-mkdir ${DEPS}/jpeg
-curl -Ls https://github.com/libjpeg-turbo/libjpeg-turbo/archive/${VERSION_JPEG}.tar.gz | tar xzC ${DEPS}/jpeg --strip-components=1
-cd ${DEPS}/jpeg
+mkdir ${DEPS}/mozjpeg
+curl -Ls https://github.com/mozilla/mozjpeg/releases/download/v${VERSION_MOZJPEG}/mozjpeg-${VERSION_MOZJPEG}-release-source.tar.gz | tar xzC ${DEPS}/mozjpeg --strip-components=1
+cd ${DEPS}/mozjpeg
 autoreconf -fiv
-./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-jpeg8 --without-turbojpeg
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --with-jpeg8
 make install-strip
 
 mkdir ${DEPS}/png16
@@ -120,7 +120,8 @@ curl -Ls http://download.osgeo.org/libtiff/tiff-${VERSION_TIFF}.tar.gz | tar xzC
 cd ${DEPS}/tiff
 # Apply patches for libtiff vulnerabilities reported since v4.0.7
 VERSION_TIFF_GIT_MASTER_SHA=$(curl -Ls https://api.github.com/repos/vadz/libtiff/git/refs/heads/master | jq -r '.object.sha' | head -c7)
-curl -Ls https://github.com/vadz/libtiff/compare/Release-v4-0-7...master.patch | patch -p1 -t || true
+curl -Ls https://github.com/vadz/libtiff/archive/${VERSION_TIFF_GIT_MASTER_SHA}.tar.gz | tar xzC ${DEPS}/tiff --strip-components=1
+cd ${DEPS}/tiff
 if [ -n "${CHOST}" ]; then autoreconf -fiv; fi
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking --disable-mdi --disable-pixarlog --disable-cxx
 make install-strip
@@ -237,7 +238,7 @@ echo "{\n\
   \"glib\": \"${VERSION_GLIB}\",\n\
   \"gsf\": \"${VERSION_GSF}\",\n\
   \"harfbuzz\": \"${VERSION_HARFBUZZ}\",\n\
-  \"jpeg\": \"${VERSION_JPEG}\",\n\
+  \"mozjpeg\": \"${VERSION_MOZJPEG}\",\n\
   \"lcms\": \"${VERSION_LCMS2}-${VERSION_LCMS2_GIT_MASTER_SHA}\",\n\
   \"orc\": \"${VERSION_ORC}\",\n\
   \"pango\": \"${VERSION_PANGO}\",\n\
